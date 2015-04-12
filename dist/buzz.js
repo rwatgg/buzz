@@ -108,14 +108,18 @@
                 return this.sound.ended;
             };
             this.loop = function() {
-                if (!supported) {
-                    return this;
+                try {
+                    if (!supported) {
+                        return this;
+                    }
+                    this.sound.loop = "loop";
+                    this.bind("ended.buzzloop", function () {
+                        this.currentTime = 0;
+                        this.play();
+                    });
+                }catch(err){
+
                 }
-                this.sound.loop = "loop";
-                this.bind("ended.buzzloop", function() {
-                    this.currentTime = 0;
-                    this.play();
-                });
                 return this;
             };
             this.unloop = function() {
@@ -180,24 +184,34 @@
                 return this.setVolume(this.volume - (value || 1));
             };
             this.setTime = function(time) {
-                if (!supported) {
-                    return this;
-                }
-                var set = true;
-                this.whenReady(function() {
-                    if (set === true) {
-                        set = false;
-                        this.sound.currentTime = time;
+                try{
+                    if (!supported) {
+                        return this;
                     }
-                });
+                    var set = true;
+                    this.whenReady(function() {
+                        if (set === true) {
+                            set = false;
+                            this.sound.currentTime = time;
+                        }
+                    });
+                }catch(err){
+
+                }
                 return this;
             };
             this.getTime = function() {
-                if (!supported) {
-                    return null;
+                try{
+                    if (!supported) {
+                        return null;
+                    }
+                    var time = Math.round(this.sound.currentTime * 100) / 100;
+                    return isNaN(time) ? buzz.defaults.placeholder : time;
+                }catch(err){
+
                 }
-                var time = Math.round(this.sound.currentTime * 100) / 100;
-                return isNaN(time) ? buzz.defaults.placeholder : time;
+
+                return 0;
             };
             this.setPercent = function(percent) {
                 if (!supported) {
@@ -206,11 +220,17 @@
                 return this.setTime(buzz.fromPercent(percent, this.sound.duration));
             };
             this.getPercent = function() {
-                if (!supported) {
-                    return null;
+                try{
+                    if (!supported) {
+                        return null;
+                    }
+                    var percent = Math.round(buzz.toPercent(this.sound.currentTime, this.sound.duration));
+                    return isNaN(percent) ? buzz.defaults.placeholder : percent;
+                }catch(err){
+
                 }
-                var percent = Math.round(buzz.toPercent(this.sound.currentTime, this.sound.duration));
-                return isNaN(percent) ? buzz.defaults.placeholder : percent;
+
+                return 0;
             };
             this.setSpeed = function(duration) {
                 if (!supported) {
