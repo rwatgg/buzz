@@ -192,7 +192,8 @@
                     this.whenReady(function() {
                         if (set === true) {
                             set = false;
-                            this.sound.currentTime = time;
+                            if(isFinite(time))
+                                this.sound.currentTime = Number(time);
                         }
                     });
                 }catch(err){
